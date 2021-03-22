@@ -5,7 +5,7 @@ from numba import jit, njit, vectorize, prange, typed, types
 import argparse
 
 
-from SWkernel import LA_K_Mat, LA_kernel
+from SWkernel import SW_K_Mat, SW_kernel
 from SpectrumKernel import spectrum_kernel
 from mismatchKernel import mismatchKernel
 from WDkernel import WD_kernel
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_type', choices=['string', 'feature'], default='string')
     parser.add_argument('--classifier', choices=['SVM', 'RIDGE'], default='SVM')
     parser.add_argument('--number_of_samples', help='To be able to try on few samples', default=2000)
-    parser.add_argument('--Kernel', help='choose a kernel from {spectrum_kernel, LA_kernel, WD_kernel, mismatchKernel} if you are using strings and from {linear, rbf} otherwise', required=True)
+    parser.add_argument('--Kernel', help='choose a kernel from {spectrum_kernel, SW_kernel, WD_kernel, mismatchKernel} if you are using strings and from {linear, poly, rbf} otherwise', required=True)
     config, unknown = parser.parse_known_args()
     print(" -- Configuration -- ")
     print("Data_type :", config.data_type)
@@ -63,9 +63,9 @@ if __name__ == '__main__':
         
     
     problem = False
-    check = (config.Kernel in ['spectrum_kernel', 'LA_kernel', 'WD_kernel', 'mismatchKernel']) or (config.Kernel in ['linear', 'rbf'])
+    check = (config.Kernel in ['spectrum_kernel', 'SW_kernel', 'WD_kernel', 'mismatchKernel']) or (config.Kernel in ['linear','poly','rbf'])
     if check==False:
-        print("Conflict between kernel and data_type, \nplease choose a kernel from {spectrum_kernel, LA_kernel, WD_kernel, mismatchKernel} if you are using strings \nand from {linear, rbf} otherwise")
+        print("Conflict between kernel and data_type, \nplease choose a kernel from {spectrum_kernel, LA_kernel, WD_kernel, mismatchKernel} if you are using strings \nand from {linear,poly,rbf} otherwise")
     
     else:
         if config.data_type=='feature':
@@ -182,17 +182,17 @@ if __name__ == '__main__':
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=WD_kernel, d=6, loss_func=log_rg_loss)
             
-            elif config.Kernel == 'LA_kernel':
+            elif config.Kernel == 'SW_kernel':
                 if config.classifier =='SVM': 
-                    classifier = ...
+                    classifier = SVM(kernel_name =config.Kernel, kernel=SW_kernel, C=0.5)
                 elif config.classifier =='RIDGE':
-                    classifier = ...
+                    classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=SW_kernel, loss_func=log_rg_loss)
             
-            elif config.Kernel == 'mismatchKernel':
-                if config.classifier =='SVM': 
-                    classifier = ...
-                elif config.classifier =='RIDGE':
-                    classifier = ...
+            # elif config.Kernel == 'mismatchKernel':
+            #     if config.classifier =='SVM': 
+            #         classifier = ...
+            #     elif config.classifier =='RIDGE':
+            #         classifier = ...
             else:
                 classifier = None
                 print("Kernel not found")

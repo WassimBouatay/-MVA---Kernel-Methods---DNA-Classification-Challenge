@@ -5,7 +5,7 @@ from cvxopt.solvers import qp
 from scipy.optimize import minimize
 from numba import njit, prange
 import time 
-from SWkernel import LA_K_Mat, LA_kernel
+from SWkernel import SW_K_Mat, SW_kernel
 from SpectrumKernel import spectrum_kernel
 from mismatchKernel import mismatchKernel
 from WDkernel import WD_kernel
@@ -44,7 +44,7 @@ class Ridge_Classifier():
     L[L==0] = -1
     self.data = data.copy()
 
-    if (self.K == None).all():
+    if self.K is None:
 
       if self.kernel_name == 'linear' :
         self.K = self.data @ self.data.T
@@ -62,10 +62,9 @@ class Ridge_Classifier():
         self.K = compute_Ker_mat(self.kernel, self.data, spectrum_size=self.spectrum_size, normalize=False)
       elif self.kernel_name == 'mismatchKernel':
         self.K = compute_Ker_mat(self.kernel, self.data, m=self.m , size =self.size)
-      elif self.kernel_name == 'LA_kernel':
-        listed = nb.typed.List(self.data)
-        self.K = LA_K_Mat(listed)
-
+      elif self.kernel_name == 'SW_kernel':
+        listed = list(self.data)
+        self.K = SW_K_Mat(listed)
       else:
         self.K = compute_Ker_mat(self.kernel, self.data)
 
@@ -85,7 +84,7 @@ class Ridge_Classifier():
           f_x += self.kernel(x ,self.data[i], spectrum_size=self.spectrum_size) * self.alpha[i]
         elif self.kernel_name == 'WD_kernel':
           f_x += self.kernel(x ,self.data[i], d=self.d) * self.alpha[i]
-        elif self.kernel_name =='LA_kernel':
+        elif self.kernel_name =='SW_kernel':
           y = self.data[i]
           f_x += self.kernel(x,y) * self.alpha[i]
 
@@ -128,7 +127,7 @@ class SVM():
     L[L==0] = -1
     if not (data is None):
       N = len(data)
-      self.data = data.copy()
+      self.data = data
     if not (Kernel_train is None):
       N = len(Kernel_train)
       self.K = Kernel_train.copy()
@@ -151,9 +150,10 @@ class SVM():
         self.K = compute_Ker_mat(self.kernel, self.data, spectrum_size=self.spectrum_size, normalize=False)
       elif self.kernel_name == 'mismatchKernel':
         self.K = compute_Ker_mat(self.kernel, self.data, m=self.m , size =self.size)
-      elif self.kernel_name == 'LA_kernel':
-        listed = nb.typed.List(self.data)
-        self.K = LA_K_Mat(listed)
+      elif self.kernel_name == 'SW_kernel':
+        # listed = nb.typed.List(list(self.data))
+        listed = list(self.data)
+        self.K = SW_K_Mat(listed)
 
       else:
         self.K = compute_Ker_mat(self.kernel, self.data)
@@ -183,7 +183,7 @@ class SVM():
             f_x += self.kernel(x ,self.data[i], d=self.d) * self.alpha[i]
           elif self.kernel_name == 'mismatchKernel':
             f_x += self.kernel(x ,self.data[i], m=self.m, size = self.size) * self.alpha[i]
-          elif self.kernel_name =='LA_kernel':
+          elif self.kernel_name =='SW_kernel':
             y = self.data[i]
             f_x += self.kernel(x,y) * self.alpha[i]
           else:
@@ -245,7 +245,7 @@ class SVM():
 
   @staticmethod
   @njit
-  def predict_LA(X_val,data,alpha):
+  def predict_SW(X_val,data,alpha):
     n = len(X_val)
     m = len(data)
     f = np.zeros(n)
@@ -254,7 +254,7 @@ class SVM():
       x = X_val[i]
       for j in prange(m):
         y = data[j]
-        f_x[j] = LA_kernel(x,y) * alpha[j]
+        f_x[j] = SW_kernel(x,y) * alpha[j]
       s = np.sum(f_x)
       if s > 0:
         f[i] = 1

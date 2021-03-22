@@ -1,2 +1,2 @@
-pip install cvxopt
-pip install numba
+cvxopt
+numba
