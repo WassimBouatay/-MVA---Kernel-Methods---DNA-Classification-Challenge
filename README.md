@@ -1,1 +1,1 @@
-# -MVA-Kernel-Methods-Challange
+# -MVA-Kernel-Methods-Challenge
