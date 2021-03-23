@@ -19,16 +19,15 @@ solvers.options['show_progress'] = False
 def log_rg_loss(x):
   return np.log(1 + np.exp(-x))
 
-
 class Ridge_Classifier():
-  def  __init__(self,lam = 0.1, kernel_name = 'linear',Kernel_mat = None , kernel = linear_kernel, 
-                spectrum_size=8, 
-                loss_func = log_rg_loss , m=0, size=4, d=3):
+  def  __init__(self,lam = 1e-5, kernel_name = 'linear',Kernel_mat = None , kernel = linear_kernel, 
+                spectrum_size=8, loss_name = 'least_squares', loss_func = log_rg_loss , m=0, size=4, d=3):
     super(Ridge_Classifier ,self).__init__()
 
     self.kernel_name = kernel_name
     self.kernel = kernel
     self.loss_func = loss_func
+    self.loss_name = loss_name
     self.lam = lam
     self.alpha = None
     self.K = Kernel_mat
@@ -38,14 +37,18 @@ class Ridge_Classifier():
     self.m = m
     self.d = d
 
-  def fit(self, data, Y):
-
+  def fit(self, data, Y , Kernel_train = None):
     L = Y.copy()
     L[L==0] = -1
-    self.data = data.copy()
+    if not (data is None):
+      N = len(data)
+      self.data = data.copy()
+    if not (Kernel_train is None):
+      N = len(Kernel_train)
+      self.K = Kernel_train.copy()
 
-    if self.K is None:
-
+    if Kernel_train is None:
+      start = time.time()
       if self.kernel_name == 'linear' :
         self.K = self.data @ self.data.T
 
@@ -62,45 +65,51 @@ class Ridge_Classifier():
         self.K = compute_Ker_mat(self.kernel, self.data, spectrum_size=self.spectrum_size, normalize=False)
       elif self.kernel_name == 'mismatchKernel':
         self.K = compute_Ker_mat(self.kernel, self.data, m=self.m , size =self.size)
-      elif self.kernel_name == 'SW_kernel':
+      elif self.kernel_name == 'LA_kernel':
         listed = list(self.data)
         self.K = SW_K_Mat(listed)
+
       else:
-        self.K = compute_Ker_mat(self.kernel, self.data)
+        self.K = compute_Ker_mat(self.kernel, self.data)  
+      print('Kernel computed')
+      print("time:", time.time()-start)    
 
-    print('Kernel computed')
-    
-    f = lambda alpha : np.mean(self.loss_func(L * (self.K @ alpha.T)))  + self.lam * alpha @ self.K @ alpha.T
+    if self.loss_name == 'least_squares':
+      n = self.K.shape[0]
+      self.alpha = np.linalg.inv(self.K + n * self.lam * np.eye(n)) @ L
+    else :
+      f = lambda alpha : np.mean(self.loss_func(L * (self.K @ alpha.T)))  + self.lam * alpha @ self.K @ alpha.T
+      self.alpha = minimize(f, np.zeros(self.data.shape[0]))['x']
 
-    self.alpha = minimize(f, np.zeros(self.data.shape[0]))['x']
-
-  def predict(self, X , predict_train=False):
+  def predict(self, X, predict_train = False ,Kernel_val_train= None):
     f = []
-
-    for x in X:
-      f_x = 0
-      for i in prange(self.alpha.shape[0]):
-        if self.kernel_name == 'spectrum_kernel':
-          f_x += self.kernel(x ,self.data[i], spectrum_size=self.spectrum_size) * self.alpha[i]
-        elif self.kernel_name == 'WD_kernel':
-          f_x += self.kernel(x ,self.data[i], d=self.d) * self.alpha[i]
-        elif self.kernel_name =='SW_kernel':
-          y = self.data[i]
-          f_x += self.kernel(x,y) * self.alpha[i]
-
+    if Kernel_val_train is None:
+      for x in X:
+        f_x = 0
+        for i in range(self.alpha.shape[0]):
+          if self.kernel_name == 'spectrum_kernel':
+            f_x += self.kernel(x ,self.data[i], spectrum_size=self.spectrum_size) * self.alpha[i]
+          elif self.kernel_name == 'WD_kernel':
+            f_x += self.kernel(x ,self.data[i], d=self.d) * self.alpha[i]
+          elif self.kernel_name == 'mismatchKernel':
+            f_x += self.kernel(x ,self.data[i], m=self.m, size = self.size) * self.alpha[i]
+          elif self.kernel_name =='LA_kernel':
+            y = self.data[i]
+            f_x += self.kernel(x,y) * self.alpha[i]
+          else:
+            f_x += self.kernel(x ,self.data[i]) * self.alpha[i]
+        if f_x > 0:
+          f.append(1)
         else:
-          f_x += self.kernel(x ,self.data[i]) * self.alpha[i]
-      
-      if f_x > 0:
-        f.append(1)
-      else:
-        f.append(0)
+          f.append(0)
+    else:
+      f = np.maximum(0, np.sign(Kernel_val_train @ self.alpha))
     if predict_train == True:
       f_train = np.maximum(0, np.sign(self.K @ self.alpha))
       return f , f_train
     else:
       return f
-  
+
 
 
 class SVM():
