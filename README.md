@@ -23,4 +23,4 @@ python start.py --number_of_samples 2000 --classifier SVM --data_type string --K
 - The user can choose among the following kernels {spectrum_kernel, SW_kernel, WD_kernel, mismatchKernel} if he has chosen the DNA_sequences as data_type. 
 
 ## Remark:
-**We added an estimation needed time to compute the kernel matrix per dataset depending on the number of samples chosen by the user and on the chosen kernel. We also note the testing phase may take an important amount of time depending on those 2 parameters.** 
+**We added an estimation needed time to compute the kernel matrix per dataset depending on the number of samples chosen by the user and on the chosen kernel. The approximations were done using "i5-8300H CPU @2.30GHz". We also note the testing phase may take an important amount of time depending on those 2 parameters.** 
