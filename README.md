@@ -8,9 +8,9 @@ Install libraries in the file Requirement.txt
 
 ## How to use
 **examples:**
-''' 
+```
 python start.py --number_of_samples 2000 --classifier SVM --data_type string --Kernel spectrum_kernel
-'''
+```
 
 **number_of_samples**: We added an option to control the number of samples to consider because some kernels take few minutes and even more than 1 hour for each data set. This will take the first samples without shuffling. We also split the selected samples randomly into a training set (85%) and a validation set (15%)
 
