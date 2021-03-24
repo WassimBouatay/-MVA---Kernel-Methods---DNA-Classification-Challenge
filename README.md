@@ -7,7 +7,7 @@
 Install libraries in the file Requirement.txt
 
 ## How to use
-examples: 
+**examples:**
 ''' 
 python start.py --number_of_samples 2000 --classifier SVM --data_type string --Kernel spectrum_kernel
 '''
