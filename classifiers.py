@@ -158,7 +158,7 @@ class SVM():
       elif self.kernel_name == 'spectrum_kernel':
         self.K = compute_Ker_mat(self.kernel, self.data, spectrum_size=self.spectrum_size, normalize=False)
       elif self.kernel_name == 'mismatchKernel':
-        self.K = compute_Ker_mat(self.kernel, self.data, m=self.m , size =self.size)
+        self.K = compute_Ker_mat(self.kernel, self.data, m=self.m , size =self.size, normalize=True)
       elif self.kernel_name == 'SW_kernel':
         # listed = nb.typed.List(list(self.data))
         listed = list(self.data)
