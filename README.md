@@ -24,4 +24,3 @@ python start.py --number_of_samples 2000 --classifier SVM --data_type string --K
 
 ## Remark:
 - **We added an estimation needed time to compute the kernel matrix per dataset depending on the number of samples chosen by the user and on the chosen kernel. The approximations were done using "i5-8300H CPU @2.30GHz". We also note the testing phase may take an important amount of time depending on those 2 parameters.** 
-- **The csv files need to be in the same directory as the code**
