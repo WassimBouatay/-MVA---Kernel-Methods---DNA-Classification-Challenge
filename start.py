@@ -179,7 +179,7 @@ if __name__ == '__main__':
             
             if config.Kernel == 'spectrum_kernel':
                 if config.classifier =='SVM': 
-                    print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(4*(number_of_samples/100)**2, 60)))
+                    print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(9.4*(number_of_samples/100)**2, 60)))
                     classifier = SVM(kernel_name =config.Kernel, kernel=spectrum_kernel, spectrum_size=7, C=10)
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=spectrum_kernel, spectrum_size=7, loss_func=log_rg_loss)
