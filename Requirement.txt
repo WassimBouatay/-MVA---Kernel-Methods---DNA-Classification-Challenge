@@ -1,2 +1,4 @@
 cvxopt
 numba
+pandas
+numpy

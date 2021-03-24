@@ -27,25 +27,25 @@ def split_data(X, y, train_ratio):
 
 
 
+path = 'Data/'
+train_data_1 = pd.read_csv(path+'Xtr0.csv' ) 
+train_data_mat_1 = pd.read_csv(path+'Xtr0_mat100.csv',header=None) 
+test_data_mat_1 = pd.read_csv(path+'Xte0_mat100.csv',header=None) 
+train_labels_1 = pd.read_csv(path+'Ytr0.csv' ) 
+test_data_1 = pd.read_csv(path+'Xte0.csv' ) 
 
-train_data_1 = pd.read_csv('Xtr0.csv' ) 
-train_data_mat_1 = pd.read_csv('Xtr0_mat100.csv',header=None) 
-test_data_mat_1 = pd.read_csv('Xte0_mat100.csv',header=None) 
-train_labels_1 = pd.read_csv('Ytr0.csv' ) 
-test_data_1 = pd.read_csv('Xte0.csv' ) 
-
-train_data_2 = pd.read_csv('Xtr1.csv' )
-train_data_mat_2 = pd.read_csv('Xtr1_mat100.csv' ,header=None) 
-test_data_mat_2 = pd.read_csv('Xte1_mat100.csv',header=None) 
-train_labels_2 = pd.read_csv('Ytr1.csv' ) 
-test_data_2 = pd.read_csv('Xte1.csv' ) 
+train_data_2 = pd.read_csv(path+'Xtr1.csv' )
+train_data_mat_2 = pd.read_csv(path+'Xtr1_mat100.csv' ,header=None) 
+test_data_mat_2 = pd.read_csv(path+'Xte1_mat100.csv',header=None) 
+train_labels_2 = pd.read_csv(path+'Ytr1.csv' ) 
+test_data_2 = pd.read_csv(path+'Xte1.csv' ) 
 
 
-train_data_3 = pd.read_csv('Xtr2.csv') 
-train_data_mat_3 = pd.read_csv('Xtr2_mat100.csv' ,header=None) 
-test_data_mat_3 = pd.read_csv('Xte2_mat100.csv',header=None) 
-train_labels_3 = pd.read_csv('Ytr2.csv') 
-test_data_3 = pd.read_csv('Xte2.csv') 
+train_data_3 = pd.read_csv(path+'Xtr2.csv') 
+train_data_mat_3 = pd.read_csv(path+'Xtr2_mat100.csv' ,header=None) 
+test_data_mat_3 = pd.read_csv(path+'Xte2_mat100.csv',header=None) 
+train_labels_3 = pd.read_csv(path+'Ytr2.csv') 
+test_data_3 = pd.read_csv(path+'Xte2.csv') 
 
 
 if __name__ == '__main__':
