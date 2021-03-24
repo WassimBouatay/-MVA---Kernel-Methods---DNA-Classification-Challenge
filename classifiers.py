@@ -210,29 +210,6 @@ class SVM():
       return f
   
   
-  '''def predict_mismatch(self,X_val,n , normalize = True):
-    l = len(self.alpha)
-    f = np.zeros(n)
-    kernel_val = np.zeros((n,l))
-    for i in range(n):
-      x = X_val[i]
-      for j in range(l):
-        y = self.data[j]
-        kernel_val[i][j] = mismatchKernel(x,y,m=self.m,size=self.size)
-    if normalize==True:
-      print("*****")
-      kernel_val = normalize_kernel_matrix(kernel_val.T @ kernel_val)
-    else:
-      kernel_val =  kernel_val @ kernel_val.T
-
-    for i in range(n):
-      f_x = [kernel_val[i][j] * self.alpha[j%l] for j in range(n)]
-      s = np.sum(f_x)
-      if s > 0:
-        f[i] = 1
-      else:
-        f[i] = 0
-    return f'''
   
   def predict_mismatch(self , X_val):
     n = len(X_val)
