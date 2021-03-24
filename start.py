@@ -4,6 +4,8 @@ import math
 from numba import jit, njit, vectorize, prange, typed, types
 import argparse
 
+import warnings
+warnings.filterwarnings("ignore")
 
 from SWkernel import SW_K_Mat, SW_kernel
 from SpectrumKernel import spectrum_kernel
@@ -53,13 +55,13 @@ if __name__ == '__main__':
     parser.add_argument('--number_of_samples', help='To be able to try on few samples', default=2000)
     parser.add_argument('--Kernel', help='choose a kernel from {spectrum_kernel, SW_kernel, WD_kernel, mismatchKernel} if you are using strings and from {linear, poly, rbf} otherwise', required=True)
     config, unknown = parser.parse_known_args()
+    number_of_samples = min(2000, int(config.number_of_samples))
     print(" -- Configuration -- ")
     print("Data_type :", config.data_type)
-    print("classfier :", config.classifier)
-    print("number_of_samples :", config.number_of_samples)
+    print("Classfier :", config.classifier)
+    print("Number_of_samples :", number_of_samples)
     print("Kernel :", config.Kernel)
     print("\n")
-    number_of_samples = int(config.number_of_samples)
         
     
     problem = False
@@ -108,12 +110,14 @@ if __name__ == '__main__':
             
             
             if config.Kernel == 'linear':
+                print("-- This will take few milliseconds per dataset to compute the kernel matrix --\n")
                 if config.classifier =='SVM': 
                     classifier = SVM(kernel_name=config.Kernel, kernel=linear_kernel, C=20)
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=linear_kernel, loss_func=log_rg_loss)
                 
             elif config.Kernel == 'rbf':
+                print("-- This will take few milliseconds per dataset to compute the kernel matrix --\n")
                 if config.classifier =='SVM': 
                     classifier = SVM(kernel_name=config.Kernel, kernel=rbf_kernel, C=20)
                 elif config.classifier =='RIDGE':
@@ -130,6 +134,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 1 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 1 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_1 = clf.predict(X1_test)
                 
@@ -139,6 +144,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 2 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 2 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_2 = clf.predict(X2_test)
                 
@@ -148,6 +154,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 3 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 3 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_3 = clf.predict(X3_test)
                                                                                                                   
@@ -172,27 +179,31 @@ if __name__ == '__main__':
             
             if config.Kernel == 'spectrum_kernel':
                 if config.classifier =='SVM': 
+                    print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(4*(number_of_samples/100)**2, 60)))
                     classifier = SVM(kernel_name =config.Kernel, kernel=spectrum_kernel, spectrum_size=7, C=10)
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=spectrum_kernel, spectrum_size=7, loss_func=log_rg_loss)
             
             elif config.Kernel == 'WD_kernel':
+                print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(3.5*(number_of_samples/500)**2, 60)))
                 if config.classifier =='SVM': 
                     classifier = SVM(kernel_name =config.Kernel, kernel=WD_kernel, d=6, C=4)
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=WD_kernel, d=6, loss_func=log_rg_loss)
             
             elif config.Kernel == 'SW_kernel':
+                print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(8.5*(number_of_samples/100)**2, 60)))
                 if config.classifier =='SVM': 
                     classifier = SVM(kernel_name =config.Kernel, kernel=SW_kernel, C=0.5)
                 elif config.classifier =='RIDGE':
                     classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=SW_kernel, loss_func=log_rg_loss)
             
-            # elif config.Kernel == 'mismatchKernel':
-            #     if config.classifier =='SVM': 
-            #         classifier = ...
-            #     elif config.classifier =='RIDGE':
-            #         classifier = ...
+            elif config.Kernel == 'mismatchKernel':
+                print("-- This will take approximately {0:.0f}min {1:02.0f}s per dataset to compute the kernel matrix --\n".format( *divmod(4.5*(number_of_samples/50)**2, 60)))
+                if config.classifier =='SVM': 
+                    classifier = SVM(kernel_name=config.Kernel, kernel=mismatchKernel,  C=0.1, m = 1, size = 4)
+                elif config.classifier =='RIDGE':
+                    classifier = Ridge_Classifier(lam = 1e-8, kernel_name=config.Kernel, kernel=mismatchKernel, m=1, size=4, loss_func=log_rg_loss)
             else:
                 classifier = None
                 print("Kernel not found")
@@ -205,6 +216,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 1 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 1 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_1 = clf.predict(X1_test)
                 
@@ -214,6 +226,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 2 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 2 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_2 = clf.predict(X2_test)
                 
@@ -223,6 +236,7 @@ if __name__ == '__main__':
                 pred_val , pred_train = clf.predict(X_val, predict_train=True)
                 print("Training accuracy for dataset 3 :", np.mean(pred_train==Y_train))
                 print("Validation accuracy for dataset 3 :", np.mean(pred_val==Y_val))
+                print("testing ...")
                 print()
                 y_test_3 = clf.predict(X3_test)
                 
@@ -232,11 +246,11 @@ if __name__ == '__main__':
             y_test = y_test_1 + y_test_2 + y_test_3
             
             ### Create Test file
-            output_file = open('kaggle.csv', "w")
+            output_file = open('Yte.csv', "w")
             output_file.write("Id,Bound\n")
             for i in range(3000):
               output_file.write("%s,%d\n" % (i, y_test[i]))
             output_file.close()
-            print("Succesfully wrote kaggle.csv'")
+            print("Succesfully wrote Yte.csv'")
         
               
