@@ -4,7 +4,7 @@
 ## Team members: Wassim BOUATAY, Amrou CHOUCHENE, Yassine NAJI
 
 ## Dependencies
-Install libraries in the file Requirement.txt
+Please install the libraries in the file Requirement.txt
 
 ## How to use
 **examples:**
